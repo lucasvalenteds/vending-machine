@@ -20,6 +20,17 @@ impl CoffeeType {
     }
 }
 
+enum Command {
+    AddMoney(f32),
+    Buy(CoffeeType)
+}
+
+trait VendingMachine {
+    fn new() -> Self;
+    fn execute(&self, command: Command);
+}
+
+
 #[cfg(test)]
 mod tests {
 
