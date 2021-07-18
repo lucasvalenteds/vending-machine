@@ -52,7 +52,10 @@ struct CoffeeMachine {
 
 impl VendingMachine for CoffeeMachine {
     fn new() -> Self {
-        CoffeeMachine { balance: 0.0, result: None }
+        CoffeeMachine {
+            balance: 0.0,
+            result: None,
+        }
     }
 
     fn execute(&mut self, command: Command) -> Self {
@@ -70,7 +73,6 @@ impl VendingMachine for CoffeeMachine {
                         balance: change,
                         result: Some(OperationResult::Success),
                     }
-
                 } else {
                     CoffeeMachine {
                         balance: self.balance,
@@ -115,6 +117,9 @@ mod tests {
             .execute(Command::Buy(CoffeeType::Cappuccino));
 
         assert_eq!(3.25, machine.balance);
-        assert_eq!(Some(OperationResult::InsufficientBalance(-1.25)), machine.result)
+        assert_eq!(
+            Some(OperationResult::InsufficientBalance(-1.25)),
+            machine.result
+        )
     }
 }
