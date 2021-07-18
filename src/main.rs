@@ -1,10 +1,12 @@
 fn main() {}
 
+#[derive(Copy, Clone, Debug)]
 struct Coffee {
     price: f32,
     size: usize,
 }
 
+#[derive(Copy, Clone, Debug)]
 enum CoffeeType {
     Expresso,
     Cappuccino,
@@ -25,6 +27,7 @@ impl CoffeeType {
     }
 }
 
+#[derive(Copy, Clone, Debug)]
 enum Command {
     AddMoney(f32),
     Buy(CoffeeType),
@@ -35,25 +38,33 @@ trait VendingMachine {
     fn execute(&mut self, command: Command) -> Self;
 }
 
+#[derive(Copy, Clone, Debug, PartialEq)]
+enum OperationResult {
+    Success,
+}
+
 #[derive(Clone, Copy)]
 struct CoffeeMachine {
     balance: f32,
+    result: Option<OperationResult>,
 }
 
 impl VendingMachine for CoffeeMachine {
     fn new() -> Self {
-        CoffeeMachine { balance: 0.0 }
+        CoffeeMachine { balance: 0.0, result: None }
     }
 
     fn execute(&mut self, command: Command) -> Self {
         match command {
             Command::AddMoney(ref amount) => CoffeeMachine {
                 balance: self.balance + amount,
+                result: Some(OperationResult::Success),
             },
             Command::Buy(ref coffe_type) => {
                 let coffee: Coffee = coffe_type.new();
                 CoffeeMachine {
                     balance: self.balance - coffee.price,
+                    result: Some(OperationResult::Success),
                 }
             }
         }
@@ -82,6 +93,7 @@ mod tests {
             .execute(Command::AddMoney(3.00))
             .execute(Command::Buy(CoffeeType::Expresso));
 
-        assert_eq!(1.50, machine.balance)
+        assert_eq!(1.50, machine.balance);
+        assert_eq!(Some(OperationResult::Success), machine.result)
     }
 }
