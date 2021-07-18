@@ -41,6 +41,7 @@ trait VendingMachine {
 #[derive(Copy, Clone, Debug, PartialEq)]
 enum OperationResult {
     Success,
+    InsufficientBalance(f32),
 }
 
 #[derive(Clone, Copy)]
@@ -60,11 +61,21 @@ impl VendingMachine for CoffeeMachine {
                 balance: self.balance + amount,
                 result: Some(OperationResult::Success),
             },
-            Command::Buy(ref coffe_type) => {
-                let coffee: Coffee = coffe_type.new();
-                CoffeeMachine {
-                    balance: self.balance - coffee.price,
-                    result: Some(OperationResult::Success),
+            Command::Buy(ref coffee_type) => {
+                let coffee: Coffee = coffee_type.new();
+                let change = self.balance - coffee.price;
+
+                if change.is_sign_positive() {
+                    CoffeeMachine {
+                        balance: change,
+                        result: Some(OperationResult::Success),
+                    }
+
+                } else {
+                    CoffeeMachine {
+                        balance: self.balance,
+                        result: Some(OperationResult::InsufficientBalance(change)),
+                    }
                 }
             }
         }
@@ -95,5 +106,15 @@ mod tests {
 
         assert_eq!(1.50, machine.balance);
         assert_eq!(Some(OperationResult::Success), machine.result)
+    }
+
+    #[test]
+    fn test_not_buying_coffee_insufficient_balance() {
+        let machine = CoffeeMachine::new()
+            .execute(Command::AddMoney(3.25))
+            .execute(Command::Buy(CoffeeType::Cappuccino));
+
+        assert_eq!(3.25, machine.balance);
+        assert_eq!(Some(OperationResult::InsufficientBalance(-1.25)), machine.result)
     }
 }
