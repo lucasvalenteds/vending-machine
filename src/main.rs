@@ -31,6 +31,7 @@ impl CoffeeType {
 enum Command {
     AddMoney(f32),
     Buy(CoffeeType),
+    DrawChange,
 }
 
 trait VendingMachine {
@@ -42,6 +43,7 @@ trait VendingMachine {
 enum OperationResult {
     Success,
     InsufficientBalance(f32),
+    NoChangeAvailable,
 }
 
 #[derive(Clone, Copy)]
@@ -78,6 +80,18 @@ impl VendingMachine for CoffeeMachine {
                         balance: self.balance,
                         result: Some(OperationResult::InsufficientBalance(change)),
                     }
+                }
+            }
+            Command::DrawChange => {
+                let result = if self.balance > 0.0 {
+                    Some(OperationResult::Success)
+                } else {
+                    Some(OperationResult::NoChangeAvailable)
+                };
+
+                CoffeeMachine {
+                    balance: 0.0,
+                    result,
                 }
             }
         }
@@ -141,5 +155,27 @@ mod tests {
             Some(OperationResult::InsufficientBalance(-1.25)),
             machine.result
         )
+    }
+
+    #[test]
+    fn test_drawing_change_after_purchase() {
+        let machine = CoffeeMachine::new()
+            .execute(Command::AddMoney(2.00))
+            .execute(Command::Buy(CoffeeType::Expresso))
+            .execute(Command::DrawChange);
+
+        assert_eq!(0.0, machine.balance);
+        assert_eq!(Some(OperationResult::Success), machine.result)
+    }
+
+    #[test]
+    fn test_not_drawing_change_when_not_available() {
+        let machine = CoffeeMachine::new()
+            .execute(Command::AddMoney(1.50))
+            .execute(Command::Buy(CoffeeType::Expresso))
+            .execute(Command::DrawChange);
+
+        assert_eq!(0.0, machine.balance);
+        assert_eq!(Some(OperationResult::NoChangeAvailable), machine.result)
     }
 }
