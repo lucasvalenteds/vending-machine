@@ -1,28 +1,33 @@
-fn main() {
-}
+fn main() {}
 
 struct Coffee {
     price: f32,
-    size: usize
+    size: usize,
 }
 
 enum CoffeeType {
     Expresso,
-    Cappuccino
+    Cappuccino,
 }
 
 impl CoffeeType {
     fn new(&self) -> Coffee {
         match *self {
-            CoffeeType::Expresso => Coffee { price: 1.50, size: 100 },
-            CoffeeType::Cappuccino => Coffee { price: 4.50, size: 200 },
+            CoffeeType::Expresso => Coffee {
+                price: 1.50,
+                size: 100,
+            },
+            CoffeeType::Cappuccino => Coffee {
+                price: 4.50,
+                size: 200,
+            },
         }
     }
 }
 
 enum Command {
     AddMoney(f32),
-    Buy(CoffeeType)
+    Buy(CoffeeType),
 }
 
 trait VendingMachine {
@@ -32,7 +37,7 @@ trait VendingMachine {
 
 #[derive(Clone, Copy)]
 struct CoffeeMachine {
-    balance: f32
+    balance: f32,
 }
 
 impl VendingMachine for CoffeeMachine {
@@ -42,15 +47,13 @@ impl VendingMachine for CoffeeMachine {
 
     fn execute(&mut self, command: Command) -> Self {
         match command {
-            Command::AddMoney(ref amount) => {
-                CoffeeMachine {
-                    balance: self.balance + amount
-                }
+            Command::AddMoney(ref amount) => CoffeeMachine {
+                balance: self.balance + amount,
             },
             Command::Buy(ref coffe_type) => {
                 let coffee: Coffee = coffe_type.new();
                 CoffeeMachine {
-                    balance: self.balance - coffee.price
+                    balance: self.balance - coffee.price,
                 }
             }
         }
