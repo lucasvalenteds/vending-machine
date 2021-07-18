@@ -101,6 +101,26 @@ mod tests {
     }
 
     #[test]
+    fn test_initializing_the_vending_machine() {
+        let machine = CoffeeMachine::new();
+
+        assert_eq!(0.0, machine.balance);
+        assert_eq!(None, machine.result);
+    }
+
+    #[test]
+    fn test_adding_money() {
+        let machine = CoffeeMachine::new()
+            .execute(Command::AddMoney(0.25))
+            .execute(Command::AddMoney(1.00))
+            .execute(Command::AddMoney(0.25))
+            .execute(Command::AddMoney(2.05));
+
+        assert_eq!(3.55, machine.balance);
+        assert_eq!(Some(OperationResult::Success), machine.result)
+    }
+
+    #[test]
     fn test_buying_coffee() {
         let machine = CoffeeMachine::new()
             .execute(Command::AddMoney(3.00))
